@@ -5,7 +5,13 @@
 	<title>Math</title>
 </head>
 <body>
-	<script src="Math.js"></script>
-	<script src="index.js"></script>
+	<script id="js"></script>
+	<script>{
+		let script = document.getElemenetById('js');
+		script.addEventListener('load', () => {
+			js.Load('Math.js', 'index.js');
+		});
+		script.src = 'Js.js';
+	}</script>
 </body>
 </html>
