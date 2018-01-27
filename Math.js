@@ -1,18 +1,26 @@
 {
 	window.math = {};
 	let Tensor = math.Tensor = js.Class(function Tensor(value) {
-		if(value instanceof Array) {
-			this.value = value.map(v => new Tensor(v));
+		if(typeof value[Symbol.iterator] !== 'undefined') {
+			this.value = [];
+			for(let row of value)
+				this.value.push(new Tensor(row));
 			this.dimension = this.value[0].dimension + 1;
 			this.size = [value.length].concat(this.value[0].size);
 		} else if(js.IsInstanceOf(Tensor)(value)) {
 			this.value = new Tensor(value.Raw()).value;
 			this.dimension = value.dimension;
 			this.size = value.size.slice();
-		} else {
+		} else {    // default case, e.g. numbers, complex numbers (not finished yet)
 			this.value = value;
 			this.dimension = 0;
 			this.size = [];
+		}
+		// validate size
+		if(this.dimension) {
+			let standard = this.value[0].value.length;
+			if(this.value.some(row => row.value.length !== standard))
+				throw new RangeError('The tensor is not in a uniform size');
 		}
 	})({})({
 		Raw() {
@@ -22,8 +30,8 @@
 			if(!(operatee instanceof Tensor))
 				operatee = new Tensor(operatee);
 			return new Tensor(
-				operatee.dimension === 0?
-					this.dimension === 0?
+				operatee.dimension === 0 ?
+					this.dimension === 0 ?
 						this.value * operatee.value :
 						this.value.map(value => value.Product(operatee)) :
 					operatee.value.map(sub => this.Product(sub))
@@ -33,7 +41,7 @@
 			if(!(operatee instanceof Tensor))
 				operatee = new Tensor(operatee);
 			if(operatee.dimension !== this.dimension || !js.Equal(operatee.size)(this.size))
-				throw new RangeError('Cannot plus two tensors with different type');
+				throw new RangeError('Cannot plus two tensors in different sizes');
 			return new Tensor(
 				this.dimension === 0 ?
 					this.value + operatee.value :
