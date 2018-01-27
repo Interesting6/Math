@@ -1,9 +1,8 @@
 {
 	window.math = {};
 	let Tensor = math.Tensor = function Tensor(value) {
-		if(!(this instanceof Tensor)) {
+		if(!(this instanceof Tensor))
 			return new Tensor(...arguments);
-		}
 		if(value instanceof Array) {    // value is iteratable, should've use that Symbol or something
 			this.value = value.map(v => new Tensor(v));
 			this.dimension = this.value[0].dimension + 1;
@@ -39,6 +38,12 @@
 					this.value + pluser.value :
 					this.value.map((v, i) => v.Plus(pluser.value[i]))
 			)
+		},
+		Get(indexes) {
+			// check if indexes is an array / iteratable
+			if(indexes.length > this.length)
+				throw new RangeError('Tensor index is out of range');
+			return new Tensor(this.dimension ? this.value[indexes[0]].Get(indexes.slice(1)) : this.value);
 		}
 	})(Tensor.prototype);
 }
