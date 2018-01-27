@@ -1,8 +1,22 @@
 {
 	window.math = {};
-	let Number = math.Number = js.Class(function Number() {
-	
-	})({})({});
+	let Number = math.Number = js.Class(function Number(real, imaginary) {
+		if(arguments.length === 1) {
+			if(real instanceof window.Number)
+				return new Number(real, 0);
+			else if(real instanceof Number)
+				return new Number(real.real, real.imaginary);
+			else
+				throw new TypeError('Unresolvable input type');
+		} else {
+			[real, imaginary] = [+real, +imaginary];
+			if(isNaN(real) || isNaN(imaginary))
+				throw new TypeError('The components of a number must not be NaN');
+			[this.real, this.imaginary] = [real, imaginary];
+		}
+	})({})({
+		// prototypes
+	});
 	let Tensor = math.Tensor = js.Class(function Tensor(value) {
 		if(typeof value[Symbol.iterator] !== 'undefined') {
 			this.value = [];
