@@ -12,7 +12,7 @@
 		} else {
 			[real, imaginary] = [+real, +imaginary];
 			if(isNaN(real) || isNaN(imaginary))
-				throw new TypeError('The components of a number0 must not be NaN');
+				throw new TypeError('The components of a number must not be NaN');
 			[this.real, this.imaginary] = [real, imaginary];
 		}
 	})({})({
@@ -37,6 +37,19 @@
 				this.real * cos - this.imaginary * sin,
 				this.real * sin + this.imaginary * cos
 			];
+		},
+		Plus(operatee) {
+			let result = new math.Number(this);
+			result.real += operatee.real;
+			result.imaginary += operatee.imaginary;
+			return result;
+		},
+		Multiply(operatee) {
+			let result = new math.Number(this);
+			result.modulus *= operatee.modulus;
+			result.argument += operatee.argument;
+			result.argument %= Math.PI;
+			return result;
 		}
 	});
 	math.Tensor = js.Class(function Tensor(value) {
