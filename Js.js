@@ -57,7 +57,7 @@
 		let Check = key => target => target.hasOwnProperty(key);
 		return !Object.keys(prototype).some(key => {
 			let CheckKey = Check(key);
-			CheckKey(prototype) && !(CheckKey(target) || CheckKey(target.__proto__))
+			return CheckKey(prototype) && !(CheckKey(target) || CheckKey(target.__proto__))
 		});
 	};
 	
