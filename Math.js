@@ -56,6 +56,9 @@
 		},
 		Conjugate() {
 			return new math.Number(this.real, -this.imaginary);
+		},
+		Reciprocal() {
+			return new math.Number(1 / this.modulus);
 		}
 	});
 	math.Tensor = js.Class(function Tensor(value) {
@@ -123,6 +126,17 @@
 					this.value.map(value => value.Dot(operatee)).reduce((a, b) => a.Plus(b), new math.Tensor(0)) :
 				operatee.value.map(sub => this.Dot(sub)).reduce((a, b) => a.Plus(b), new math.Tensor(0))
 			)
+		},
+		Kronecker(operatee) {
+			if(!(operatee instanceof math.Tensor))
+				operatee = new math.Tensor(operatee);
+			return new math.Tensor(
+				operatee.degree === 0 ?
+					this.degree === 0 ?
+						this.value * operatee.value :
+						this.value.map(value => value.Kronecker(operatee)) :
+					operatee.value.map(sub => this.Kronecker(sub).value.reduce((a, b) => a.concat(b), [])).reduce((a, b) => a.concat(b), [])
+			);
 		}
 	});
 }
