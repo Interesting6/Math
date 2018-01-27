@@ -21,29 +21,35 @@
 		Raw() {
 			return this.dimension === 0 ? this.value : this.value.map(v => v.Raw());
 		},
-		Product(multiplier) {
+		Product(operatee) {
+			if(!(operatee instanceof Tensor))
+				operatee = Tensor(operatee);
 			return (value => new Tensor(value))(
-				!multiplier.dimension ?
+				!operatee.dimension ?
 					!this.dimension ?
-						this.value * multiplier.value :
-						this.value.map(value => value.Product(multiplier)) :
-					multiplier.value.map(mul => this.Product(mul))
+						this.value * operatee.value :
+						this.value.map(value => value.Product(operatee)) :
+					operatee.value.map(mul => this.Product(mul))
 			);
 		},
-		Plus(pluser) {
-			if(pluser.dimension !== this.dimension || !js.Equal(pluser.size)(this.size))
+		Plus(operatee) {
+			if(!(operatee instanceof Tensor))
+				operatee = Tensor(operatee);
+			if(operatee.dimension !== this.dimension || !js.Equal(operatee.size)(this.size))
 				throw new RangeError('Cannot plus two tensors with different type');
 			return new Tensor(
 				this.dimension === 0 ?
-					this.value + pluser.value :
-					this.value.map((v, i) => v.Plus(pluser.value[i]))
+					this.value + operatee.value :
+					this.value.map((v, i) => v.Plus(operatee.value[i]))
 			)
 		},
 		Get(indexes) {
-			// check if indexes is an array / iteratable
-			if(indexes.length > this.length)
-				throw new RangeError('Tensor index is out of range');
-			return new Tensor(this.dimension ? this.value[indexes[0]].Get(indexes.slice(1)) : this.value);
+			return indexes.length ? new Tensor(this.dimension ? this.value[indexes[0]].Get(indexes.slice(1)) : this.value) : this;
+		},
+		Set(indexes, operatee) {
+			if(!(operatee instanceof Tensor))
+				operatee = Tensor(operatee);
+			indexes.length ? this.value[indexes[0]].Set(indexes.slice(1), operatee) : this.value = operatee.value;
 		}
 	})(Tensor.prototype);
 }
