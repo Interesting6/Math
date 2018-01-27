@@ -9,12 +9,12 @@
 				this.imaginary = real.imaginary;
 			} else
 				throw new TypeError('Unresolvable input type');
-		} else {
+		} else if (arguments.length === 2) {
 			[real, imaginary] = [+real, +imaginary];
 			if(isNaN(real) || isNaN(imaginary))
 				throw new TypeError('The components of a number must not be NaN');
 			[this.real, this.imaginary] = [real, imaginary];
-		}
+		} else throw new Error('Invalid argument length');
 	})({})({
 		get modulus() {
 			return this.real * this.real + this.imaginary * this.imaginary;
@@ -39,10 +39,10 @@
 			];
 		},
 		Plus(operatee) {
-			let result = new math.Number(this);
-			result.real += operatee.real;
-			result.imaginary += operatee.imaginary;
-			return result;
+			return new math.Number(
+				this.real + operatee.real,
+				this.imaginary + operatee.imaginary
+			);
 		},
 		Multiply(operatee) {
 			let result = new math.Number(this);
@@ -50,6 +50,12 @@
 			result.argument += operatee.argument;
 			result.argument %= Math.PI;
 			return result;
+		},
+		Negative() {
+			return new math.Number(-this.real, -this.imaginary);
+		},
+		Conjugate() {
+			return new math.Number(this.real, -this.imaginary);
 		}
 	});
 	math.Tensor = js.Class(function Tensor(value) {
